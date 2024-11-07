@@ -13,6 +13,7 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
+  
   <body>
     <div
       class="relative flex size-full min-h-screen flex-col bg-[#1C1D22] dark group/design-root overflow-x-hidden"
@@ -106,5 +107,65 @@
           </footer>
         </div>
       </div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const signupButton = document.querySelector("button"); // Select the Sign Up button
+      
+          signupButton.addEventListener("click", async (e) => {
+            e.preventDefault();
+      
+            // Collect form data
+            const email = document.querySelector('input[placeholder="Enter your student email"]').value;
+            const password = document.querySelector('input[placeholder="Create a password"]').value;
+            const confirmPassword = document.querySelector('input[placeholder="Confirm password"]').value;
+            const fullName = document.querySelector('input[placeholder="Full name"]').value;
+            const studentId = document.querySelector('input[placeholder="Student ID number"]').value;
+            const idCardInput = document.getElementById("upload-id").files[0]; // Get the ID card file
+      
+            if (password !== confirmPassword) {
+              alert("Passwords do not match!");
+              return;
+            }
+      
+            // Read ID card file as base64 (for simplicity in this example)
+            let idImage = null;
+            if (idCardInput) {
+              const reader = new FileReader();
+              reader.readAsDataURL(idCardInput);
+              idImage = await new Promise((resolve) => {
+                reader.onload = () => resolve(reader.result);
+              });
+            }
+         // Prepare the payload
+      const payload = {
+        email,
+        password,
+        idImage
+      };
+
+      try {
+        const response = await fetch("http://localhost:3000/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert(data.message);
+          window.location.href = "login.html"; // Redirect to login page on success
+        } else {
+          alert(data.message); // Show error message from server
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("An error occurred. Please try again.");
+      }
+    });
+  });
+</script>      
     </body>
   </html>
